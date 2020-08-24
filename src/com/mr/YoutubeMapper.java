@@ -2,33 +2,30 @@ package com.mr;
 
 import java.io.IOException;
 
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapred.MapReduceBase;
+import org.apache.hadoop.mapred.Mapper;
+import org.apache.hadoop.mapred.OutputCollector;
+import org.apache.hadoop.mapred.Reporter;
 
-import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.Session;
-
-public class YoutubeMapper extends Mapper<LongWritable, Text, Text, IntWritable>{
-	private String KEYSPACE_NAME="test";
-	private Cluster cluster;
-	public void map(LongWritable key, Text value, Context con) throws IOException, InterruptedException
-	{
-		/*
-		 * cluster =
-		 * Cluster.builder().addContactPoint("127.0.0.1").withPort(9042).build();
-		 * Session session = cluster.connect(KEYSPACE_NAME);
-		 * System.out.println("Connected to Cassandra");
-		 */
-		
-		  String line = value.toString(); 
-		  String[] words=line.split(","); 
-		  for(String word: words ) { 
-		  Text outputKey = new Text(word.toUpperCase().trim());
-		  IntWritable outputValue = new IntWritable(1); 
-		  con.write(outputKey,outputValue); 
-		  }
-		 
-	}
+public class YoutubeMapper extends MapReduceBase implements Mapper<LongWritable,Text,Text,Text>{
+	//private final static IntWritable one = new IntWritable(1);  
+    private Text data = new Text(); 
+    private Text num = new Text();
+   // private IntWritable num = new IntWritable(1);
+    public void map(LongWritable key, Text value,OutputCollector<Text,Text> output,     
+            Reporter reporter) throws IOException{    
+    	System.out.println(value.toString());
+    	num.set("1");
+    	String[] columns = value.toString().split(",");
+    	int i=0;
+    	for(String column:columns) {
+    	 if(i==4) {	
+    	 data.set(column);     	 
+         output.collect(data, num);
+    	 }
+         i++;
+    	}
+    }
 }

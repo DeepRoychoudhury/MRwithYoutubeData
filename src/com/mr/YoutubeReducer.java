@@ -25,5 +25,8 @@ public class YoutubeReducer extends MapReduceBase implements Reducer<Text,Text,T
 		cache.put(key, sum);
 		output.collect(key, new IntWritable(sum));
 	}
+	public void AnalysingCache() {
+		System.out.println("Cache are : "+cache);
+	}
 	}
 

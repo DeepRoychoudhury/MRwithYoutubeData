@@ -1,6 +1,7 @@
 package com.mr;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import org.apache.hadoop.io.IntWritable;
@@ -11,7 +12,7 @@ import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 
 public class YoutubeReducer extends MapReduceBase implements Reducer<Text,Text,Text,IntWritable>{
-
+	HashMap<Text,Integer> cache = new HashMap<Text,Integer>();
 	public void reduce(Text key, Iterator<Text> values, OutputCollector<Text, IntWritable> output,
 		Reporter reporter) throws IOException {
 		System.out.println(key);
@@ -21,6 +22,7 @@ public class YoutubeReducer extends MapReduceBase implements Reducer<Text,Text,T
 			int num = Integer.parseInt(number); 
 			sum+=num;    
 		}		
+		cache.put(key, sum);
 		output.collect(key, new IntWritable(sum));
 	}
 	}

@@ -15,7 +15,7 @@ import org.apache.hadoop.mapred.TextOutputFormat;
 public class Runner {
 
 	public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
-		YoutubeReducer yr = new YoutubeReducer();
+		
 		JobConf conf = new JobConf(Runner.class);
 		conf.setJobName("YoutubeData");
 		conf.setOutputKeyClass(Text.class);
@@ -25,7 +25,6 @@ public class Runner {
 		conf.setInputFormat(TextInputFormat.class);
 		conf.setOutputFormat(TextOutputFormat.class);
 		firstjob(conf,args);
-		yr.AnalysingCache();
 		secondjob(conf,args);
 		thirdjob(conf,args);
 		fourthjob(conf,args);

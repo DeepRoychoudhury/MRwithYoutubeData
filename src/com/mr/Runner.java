@@ -20,6 +20,7 @@ public class Runner {
 		conf.setJobName("YoutubeData");
 		conf.setOutputKeyClass(Text.class);
 		conf.setOutputValueClass(Text.class);
+		//conf.setOutputValueClass(Top10MedianStdDevTuple.class);
 		conf.setMapperClass(YoutubeMapper.class);
 		conf.setReducerClass(YoutubeReducer.class);
 		conf.setInputFormat(TextInputFormat.class);

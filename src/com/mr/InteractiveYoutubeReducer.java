@@ -10,7 +10,7 @@ import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 
-public class ThirdYoutubeReducer extends MapReduceBase implements Reducer<Text,Text,Text,Long>{
+public class InteractiveYoutubeReducer extends MapReduceBase implements Reducer<Text,Text,Text,Long>{
 	HashMap<Text,Integer> cache = new HashMap<Text,Integer>();
 	private Text likes = new Text();
 	private Text dislikes = new Text();

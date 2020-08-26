@@ -9,7 +9,7 @@ import org.apache.hadoop.mapred.Mapper;
 import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reporter;
 
-public class YoutubeMapper extends MapReduceBase implements Mapper<LongWritable,Text,Text,Text>{
+public class Top10YoutubeMapper extends MapReduceBase implements Mapper<LongWritable,Text,Text,Text>{
 	//private final static IntWritable one = new IntWritable(1);  
     private Text data = new Text(); 
     private Text num = new Text();

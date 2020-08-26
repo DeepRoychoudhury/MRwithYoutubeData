@@ -16,7 +16,7 @@ import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 
-public class YoutubeReducer extends MapReduceBase implements Reducer<Text,Text,Text,IntWritable>{
+public class Top10YoutubeReducer extends MapReduceBase implements Reducer<Text,Text,Text,IntWritable>{
 	HashMap<Integer, String> pairs= new HashMap<Integer,String>();
 	HashMap<String,Integer> settingpairs = new HashMap<String,Integer>();
 	Top10MedianStdDevTuple params = new Top10MedianStdDevTuple();

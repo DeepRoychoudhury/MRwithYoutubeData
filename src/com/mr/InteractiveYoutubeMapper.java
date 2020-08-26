@@ -9,7 +9,7 @@ import org.apache.hadoop.mapred.Mapper;
 import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reporter;
 
-public class ThirdYoutubeMapper extends MapReduceBase implements Mapper<LongWritable,Text,Text,Text>{
+public class InteractiveYoutubeMapper extends MapReduceBase implements Mapper<LongWritable,Text,Text,Text>{
 	private Text data = new Text();
 	private Text views = new Text();
 	@Override

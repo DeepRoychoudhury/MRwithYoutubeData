@@ -12,17 +12,16 @@ import org.apache.hadoop.mapred.TextInputFormat;
 import org.apache.hadoop.mapred.TextOutputFormat;
 
 
-public class Runner {
+public class Top10Runner {
 
 	public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
 		
-		JobConf conf = new JobConf(Runner.class);
+		JobConf conf = new JobConf(Top10Runner.class);
 		conf.setJobName("YoutubeData");
 		conf.setOutputKeyClass(Text.class);
 		conf.setOutputValueClass(Text.class);
-		//conf.setOutputValueClass(Top10MedianStdDevTuple.class);
-		conf.setMapperClass(YoutubeMapper.class);
-		conf.setReducerClass(YoutubeReducer.class);
+		conf.setMapperClass(Top10YoutubeMapper.class);
+		conf.setReducerClass(Top10YoutubeReducer.class);
 		conf.setInputFormat(TextInputFormat.class);
 		conf.setOutputFormat(TextOutputFormat.class);
 		firstjob(conf,args);

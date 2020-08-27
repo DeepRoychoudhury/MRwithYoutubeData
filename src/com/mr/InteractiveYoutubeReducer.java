@@ -2,6 +2,7 @@ package com.mr;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -19,10 +20,17 @@ public class InteractiveYoutubeReducer extends MapReduceBase implements Reducer<
 	double median;
 	double stddev;
 	int count=0;
+	String country;
+	PostgresqlJdbcConnection pg = new PostgresqlJdbcConnection();
 	
 	public void reduce(Text key, Iterator<Text> values, OutputCollector<Text, MedianStdDevTuple> output,
 			Reporter reporter) throws IOException {
 		System.out.println(key);
+		
+		//country identifier
+		key = countryidentifier(key);
+		System.out.println(country);
+		
 		double sum=0.0d;
 		list.clear();
 		 while (values.hasNext()) {  
@@ -52,6 +60,7 @@ public class InteractiveYoutubeReducer extends MapReduceBase implements Reducer<
 			count++;
 			if(sum!=0.0) {
 			med.add(sum);
+			Collections.sort(med);
 			}
 		//cache.put(key, sum);
 		
@@ -88,6 +97,37 @@ public class InteractiveYoutubeReducer extends MapReduceBase implements Reducer<
 				objStdDev.setSd(Math.round(stddev));
 				System.out.println("Standard Deviation is : "+stddev);
 				
+				pg.insertInteractiveData(key,sum,country,objStdDev.getMedian(),objStdDev.getSd());
+				pg.updatestddevmedian("interactive",country,objStdDev.getMedian(),objStdDev.getSd());
 		output.collect(key, objStdDev);
+	
+	}
+	private Text countryidentifier(Text key) {
+		if(key.toString().contains("IN")) {
+			country="IN";
+			String keystr=key.toString().replace("IN", "");
+			key = new Text(keystr);
+		}
+		if(key.toString().contains("US")) {
+			country="US";
+			String keystr=key.toString().replace("US", "");
+			key = new Text(keystr);
+		}
+		if(key.toString().contains("CA")) {
+			country="CA";
+			String keystr=key.toString().replace("CA", "");
+			key = new Text(keystr);
+		}
+		if(key.toString().contains("FR")) {
+			country="FR";
+			String keystr=key.toString().replace("FR", "");
+			key = new Text(keystr);
+		}
+		if(key.toString().contains("RU")) {
+			country="RU";
+			String keystr=key.toString().replace("RU", "");
+			key = new Text(keystr);
+		}
+		return key;
 	}
 	}

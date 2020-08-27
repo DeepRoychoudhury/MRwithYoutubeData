@@ -18,12 +18,19 @@ public class ViewsYoutubeReducer extends MapReduceBase implements Reducer<Text, 
 	double median = 0;
 	double stddev = 0;
 	int count=0;
+	String country;
+
+	PostgresqlJdbcConnection pg = new PostgresqlJdbcConnection();
 	
 	@Override
 	public void reduce(Text key, Iterator<DoubleWritable> values, OutputCollector<Text, MedianStdDevTuple> output,
 			Reporter reporter) throws IOException {
 		System.out.println(key);
-		double sum = 0;
+		
+		//country identifier
+		key = countryidentifier(key);
+		System.out.println(country);
+			double sum = 0;
 		list.clear();
 		 while (values.hasNext()) {  
 			double number=Double.parseDouble(values.next().toString());
@@ -72,6 +79,38 @@ public class ViewsYoutubeReducer extends MapReduceBase implements Reducer<Text, 
 		stddev = (double) Math.sqrt(sumOfSquares / (count - 1));
 		objStdDev.setSd(Math.round(stddev));
 		System.out.println("Standard Deviation is : "+stddev);
+		//pg.deleteAllViewsDatawithcountry(country);
+		pg.insertViewsData(key,sum,objStdDev.getMedian(),objStdDev.getSd(),country);
+		pg.updatestddevmedian("views",country,objStdDev.getMedian(),objStdDev.getSd());
 		output.collect(key, objStdDev);
+	
+	}
+	private Text countryidentifier(Text key) {
+		if(key.toString().contains("IN")) {
+			country="IN";
+			String keystr=key.toString().replace("IN", "");
+			key = new Text(keystr);
+		}
+		if(key.toString().contains("US")) {
+			country="US";
+			String keystr=key.toString().replace("US", "");
+			key = new Text(keystr);
+		}
+		if(key.toString().contains("CA")) {
+			country="CA";
+			String keystr=key.toString().replace("CA", "");
+			key = new Text(keystr);
+		}
+		if(key.toString().contains("FR")) {
+			country="FR";
+			String keystr=key.toString().replace("FR", "");
+			key = new Text(keystr);
+		}
+		if(key.toString().contains("RU")) {
+			country="RU";
+			String keystr=key.toString().replace("RU", "");
+			key = new Text(keystr);
+		}
+		return key;
 	}
 }

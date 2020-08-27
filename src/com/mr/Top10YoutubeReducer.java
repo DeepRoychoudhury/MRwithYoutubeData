@@ -1,14 +1,11 @@
 package com.mr;
 
 import java.io.IOException;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import org.apache.commons.collections.BidiMap;
-import org.apache.commons.collections.bidimap.DualHashBidiMap;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.MapReduceBase;
@@ -19,12 +16,17 @@ import org.apache.hadoop.mapred.Reporter;
 public class Top10YoutubeReducer extends MapReduceBase implements Reducer<Text,Text,Text,IntWritable>{
 	HashMap<Integer, String> pairs= new HashMap<Integer,String>();
 	HashMap<String,Integer> settingpairs = new HashMap<String,Integer>();
-	Top10MedianStdDevTuple params = new Top10MedianStdDevTuple();
 	ArrayList<Integer> sumlength = new ArrayList<Integer>();
 	ArrayList<Integer> top10 = new ArrayList<Integer>();
+	String country;
+	PostgresqlJdbcConnection pg = new PostgresqlJdbcConnection();
+	
 	public void reduce(Text key, Iterator<Text> values, OutputCollector<Text, IntWritable> output,
 		Reporter reporter) throws IOException {
 		System.out.println(key);
+		
+		//country identifier
+		key = countryidentifier(key);
 		int sum=0;
 		 while (values.hasNext()) {  
 			String number=values.next().toString();
@@ -47,10 +49,14 @@ public class Top10YoutubeReducer extends MapReduceBase implements Reducer<Text,T
 		 
 		 //Finding out top 10 categories key,value pair here from HashMap
 		 if(top10.size()==10) {
+			 pg.deleteAllDatawithcountry(country);
+			 
 		 System.out.println("Top 10 category id with Sums are : ");
 		 for(int i=0;i<top10.size();i++) {
 			 //settingpairs.put(pairs.get(top10.get(i)), top10.get(i));
-			 System.out.println(pairs.get(top10.get(i)) + " : " + top10.get(i));	
+			 System.out.println(pairs.get(top10.get(i)) + " : " + top10.get(i));
+			 System.out.println(country);
+			 pg.inserttop10Data(pairs.get(top10.get(i)), top10.get(i), country);
 			 //params.setTop10categories(settingpairs);
 		 }
 		 }
@@ -59,9 +65,35 @@ public class Top10YoutubeReducer extends MapReduceBase implements Reducer<Text,T
 		 
 		 output.collect(key, new IntWritable(sum));
 		}
+	
 	}
-	public void AnalysingCache() {
-		System.out.println("Top 10 : "+params.getTop10categories());
+	private Text countryidentifier(Text key) {
+		if(key.toString().contains("IN")) {
+			country="IN";
+			String keystr=key.toString().replace("IN", "");
+			key = new Text(keystr);
+		}
+		if(key.toString().contains("US")) {
+			country="US";
+			String keystr=key.toString().replace("US", "");
+			key = new Text(keystr);
+		}
+		if(key.toString().contains("CA")) {
+			country="CA";
+			String keystr=key.toString().replace("CA", "");
+			key = new Text(keystr);
+		}
+		if(key.toString().contains("FR")) {
+			country="FR";
+			String keystr=key.toString().replace("FR", "");
+			key = new Text(keystr);
+		}
+		if(key.toString().contains("RU")) {
+			country="RU";
+			String keystr=key.toString().replace("RU", "");
+			key = new Text(keystr);
+		}
+		return key;
 	}
 	}
 

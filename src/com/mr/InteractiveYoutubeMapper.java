@@ -17,26 +17,30 @@ public class InteractiveYoutubeMapper extends MapReduceBase implements Mapper<Lo
 		String[] columns = value.toString().split(",");
     	int i=0;
     	for(String column:columns) {
+    		
     	 if(i==4) {	
+    		 if(!column.equals("category_id")) {
     	 data.set(column);
+    		 }
     	 }
     	 if(i==8) {
-    		 views.set("likes:"+column);;
+    		 views.set("likes:"+column);
         	 //views.set((int) Long.parseLong(column));
              output.collect(data, views);
     	 }
     	 if(i==9) {
-    		 views.set("dislikes:"+column);;
+    		 views.set("dislikes:"+column);
         	 //views.set((int) Long.parseLong(column));
              output.collect(data, views);
     	 }
     	 if(i==10) {
-    		 views.set("comment_count:"+column);;
+    		 views.set("comment_count:"+column);
         	 //views.set((int) Long.parseLong(column));
              output.collect(data, views);
     	 }
          i++;
-    	}		
+    	}	
+    	
 	}
 
 }

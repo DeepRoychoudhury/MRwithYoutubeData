@@ -1,51 +1,93 @@
 package com.mr;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
+import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.MapReduceBase;
 import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 
-public class InteractiveYoutubeReducer extends MapReduceBase implements Reducer<Text,Text,Text,Long>{
-	HashMap<Text,Integer> cache = new HashMap<Text,Integer>();
-	private Text likes = new Text();
-	private Text dislikes = new Text();
-	private Text comment_count = new Text();
-	public void reduce(Text key, Iterator<Text> values, OutputCollector<Text, Long> output,
-		Reporter reporter) throws IOException {
+public class InteractiveYoutubeReducer extends MapReduceBase implements Reducer<Text, Text, Text, MedianStdDevTuple>{
+	public List<Double> list = new ArrayList<Double>();
+	public MedianStdDevTuple objStdDev = new MedianStdDevTuple();
+	ArrayList<Double> med = new ArrayList<Double>();
+	double median;
+	double stddev;
+	int count=0;
+	
+	public void reduce(Text key, Iterator<Text> values, OutputCollector<Text, MedianStdDevTuple> output,
+			Reporter reporter) throws IOException {
 		System.out.println(key);
-		long likesum = 0,dislikesum = 0,commentsum=0;
+		double sum=0.0d;
+		list.clear();
 		 while (values.hasNext()) {  
 			String number=values.next().toString();
 			System.out.println("Number : "+number);
 			if (number.contains("likes") && !number.contains("dis") && !number.contains(":likes")){
 				String splittednum=number.replace("likes:", "");
-			long num = Long.parseLong(splittednum); 
-			likesum+=num;    
-			likes.set(key+" : likes");
+			double num = Double.parseDouble(splittednum); 
+			sum+=num;    
+			list.add(num);
 			}
 			else if(number.contains("dislikes") && !number.contains(":dislikes")) {
 				String splittednum=number.replace("dislikes:", "");
-				long num = Long.parseLong(splittednum); 
-				dislikesum+=num; 
-				dislikes.set(key+" : dislikes");
+				double num = Double.parseDouble(splittednum); 
+				sum+=num; 
+				list.add(num);
 			}
 			else if(number.contains("comment_count") && !number.contains(":comment_count")) {
 				String splittednum=number.replace("comment_count:", "");
-				long num = Long.parseLong(splittednum); 
-				commentsum+=num; 			
-				comment_count.set(key+" : comment_count");
+				double num = Double.parseDouble(splittednum); 
+				sum+=num; 			
+				list.add(num);
 			}
 		}		
+
+
+			count++;
+			if(sum!=0.0) {
+			med.add(sum);
+			}
 		//cache.put(key, sum);
-		System.out.println("Key : "+key + "Like Sum : "+likesum+ "Like Sum : "+dislikesum+ "Like Sum : "+commentsum);
 		
-		output.collect(likes, likesum);
-		output.collect(dislikes, dislikesum);
-		output.collect(comment_count, commentsum);
+		
+		//median calculation
+				if(count>1) {
+					System.out.println(count);
+				if(count % 2 == 0 && count > 2) {
+					System.out.println(med.get((count/2)-2) + " : " +med.get((int) (((count/2)-1))));
+					if(((med.get((count/2)-2)+med.get((count/2)-1))/2.0)>=0) {
+					double alg = (double) ((med.get((count/2)-2)+med.get((count/2)-1))/2.0);
+					System.out.println(alg);
+					if(alg>=0) {
+					median=alg;
+					}
+					}
+				}
+				else{
+					if(((count/2))>=0) {
+					median=med.get(((count/2))-1);
+					}
+				}
+				}
+				System.out.println(med);
+				objStdDev.setMedian(Math.round(median));
+				
+				//finding standard deviation
+				double mean = sum / count;
+				double sumOfSquares = 0;
+				for (double doubleWritable : list) {
+				sumOfSquares += (doubleWritable - mean) * (doubleWritable - mean);
+				}
+				stddev = (double) Math.sqrt(sumOfSquares / (count - 1));
+				objStdDev.setSd(Math.round(stddev));
+				System.out.println("Standard Deviation is : "+stddev);
+				
+		output.collect(key, objStdDev);
 	}
 	}

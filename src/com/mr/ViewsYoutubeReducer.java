@@ -61,7 +61,7 @@ public class ViewsYoutubeReducer extends MapReduceBase implements Reducer<Text, 
 		}
 		System.out.println(med);
 		System.out.println("Median value is : "+median);
-		objStdDev.setMedian(median);
+		objStdDev.setMedian(Math.round(median));
 		
 		//finding standard deviation
 		double mean = sum / count;
@@ -70,7 +70,7 @@ public class ViewsYoutubeReducer extends MapReduceBase implements Reducer<Text, 
 		sumOfSquares += (doubleWritable - mean) * (doubleWritable - mean);
 		}
 		stddev = (double) Math.sqrt(sumOfSquares / (count - 1));
-		objStdDev.setSd(stddev);
+		objStdDev.setSd(Math.round(stddev));
 		System.out.println("Standard Deviation is : "+stddev);
 		output.collect(key, objStdDev);
 	}
